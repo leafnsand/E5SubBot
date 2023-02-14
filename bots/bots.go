@@ -50,14 +50,30 @@ func Start() {
 	}
 
 	if config.Socks5 != "" {
-		dialer, err := proxy.SOCKS5("tcp", config.Socks5, nil, proxy.Direct)
-		if err != nil {
-			zap.S().Fatalw("failed to get dialer",
-				"error", err, "proxy", config.Socks5)
+		socks5Config := string.Split(config.Socks5, "|")
+		if len(socks5Config) > 2 {
+			auth := proxy.Auth {
+				User: socks5Config[1],
+				Password: socks5Config[2]
+			}
+			dialer, err := proxy.SOCKS5("tcp", socks5Config[0], &auth, proxy.Direct)
+			if err != nil {
+				zap.S().Fatalw("failed to get dialer",
+					"error", err, "proxy", config.Socks5)
+			}
+			transport := &http.Transport{}
+			transport.Dial = dialer.Dial
+			setting.Client = &http.Client{Transport: transport}
+		} else {
+			dialer, err := proxy.SOCKS5("tcp", config.Socks5, nil, proxy.Direct)
+			if err != nil {
+				zap.S().Fatalw("failed to get dialer",
+					"error", err, "proxy", config.Socks5)
+			}
+			transport := &http.Transport{}
+			transport.Dial = dialer.Dial
+			setting.Client = &http.Client{Transport: transport}
 		}
-		transport := &http.Transport{}
-		transport.Dial = dialer.Dial
-		setting.Client = &http.Client{Transport: transport}
 	}
 
 	bot, err = tb.NewBot(setting)
