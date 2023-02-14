@@ -10,6 +10,7 @@ import (
 	tb "gopkg.in/tucnak/telebot.v2"
 	"net/http"
 	"time"
+	"strings"
 )
 
 var bot *tb.Bot
@@ -50,7 +51,7 @@ func Start() {
 	}
 
 	if config.Socks5 != "" {
-		socks5Config := string.Split(config.Socks5, "|")
+		socks5Config := strings.Split(config.Socks5, "|")
 		if len(socks5Config) > 2 {
 			auth := proxy.Auth {
 				User: socks5Config[1],
