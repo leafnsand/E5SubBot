@@ -54,7 +54,7 @@ func Start() {
 		if len(socks5Config) > 2 {
 			auth := proxy.Auth {
 				User: socks5Config[1],
-				Password: socks5Config[2]
+				Password: socks5Config[2],
 			}
 			dialer, err := proxy.SOCKS5("tcp", socks5Config[0], &auth, proxy.Direct)
 			if err != nil {
